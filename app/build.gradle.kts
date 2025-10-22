@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.kotlin.kapt) // <-- 1. AÑADIDO (Para Room)
 }
 
 android {
@@ -38,11 +37,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-    // 2. AÑADIDO (Bloque necesario para Kapt)
-    kapt {
-        correctErrorTypes = true
-    }
 }
 
 dependencies {
@@ -55,15 +49,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-
-    // 3. CORREGIDO (Estas son las 4 líneas de tu Rol 1)
-    // (Reemplaza las 'room.common.jvm' y 'room.ktx' que tenías por estas)
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler) // <-- OJO: es 'kapt'
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    // ---------------------------------------------------
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -4,44 +4,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+// Importa el "Tema" de tu app (donde están tus colores pasteles)
 import cl.aplicacion.adoptapet.ui.theme.AdoptaPetTheme
+import cl.aplicacion.adoptapet.ui.navigation.AppNavigation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // enableEdgeToEdge() permite que tu app use la pantalla completa
         enableEdgeToEdge()
+
+        // setContent es donde empieza la UI de Jetpack Compose
         setContent {
+            // 1. Carga tu tema (AdoptaPetTheme).
+            //    adentro usará tus colores pasteles del archivo ui/theme/Color.kt
             AdoptaPetTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                // 2. Aquí llamas a tu Navegación.
+                // Le entregas el control a AppNavigation, que decidirá
+                // qué pantalla mostrar (primero "feed").
+                AppNavigation()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AdoptaPetTheme {
-        Greeting("Android")
     }
 }
