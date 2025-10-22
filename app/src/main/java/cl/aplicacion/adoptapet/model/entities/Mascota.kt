@@ -9,7 +9,7 @@ data class Mascota(
     val id: Int = 0,
 
     val nombre: String,
-    val fotoUri: String, // Aquí guardaremos la URI (texto) de la foto
+    val fotoUri: String, //
     val raza: String,
     val edad: Int,
     val vacunasAlDia: Boolean,

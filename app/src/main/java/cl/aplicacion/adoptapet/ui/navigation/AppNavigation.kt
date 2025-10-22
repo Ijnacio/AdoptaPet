@@ -1,38 +1,66 @@
 package cl.aplicacion.adoptapet.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel // Importa el "viewModel" de compose
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import cl.aplicacion.adoptapet.ui.screens.FeedScreen
+import cl.aplicacion.adoptapet.AdoptaPetApp // <-- Importa tu App (Paso 1)
 import cl.aplicacion.adoptapet.ui.screens.AgregarMascotaScreen
 import cl.aplicacion.adoptapet.ui.screens.DetalleMascotaScreen
+import cl.aplicacion.adoptapet.ui.screens.FeedScreen
+import cl.aplicacion.adoptapet.viewmodel.AppViewModelFactory // <-- Importa la Fábrica (Paso 2)
+import cl.aplicacion.adoptapet.viewmodel.FormularioViewModel
+import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
 
 @Composable
 fun AppNavigation() {
-    // 1. Crea el Controlador de Navegación
-    // 'rememberNavController' es el cerebro que "recuerda" en qué pantalla estamos y maneja el historial (para poder ir "atrás").
+
     val navController = rememberNavController()
-    // 2. Crea el "Host" de Navegación
-    // 'NavHost' es el contenedor visual que mostrará la pantalla correcta  según la ruta activa.
-    NavHost(
-        navController = navController,  // Le pasas el cerebro
-        startDestination = "feed"      //  ruta al abrir la app
-    ) {
-        // --- DEFINE TUS 3 RUTAS V1 ---
-        // Ruta 1: El Feed 'composable' define una "parada" o pantalla en tu mapa
+
+    // --- INYECCIÓN DE DEPENDENCIAS (EL "PEGAMENTO") ---
+    val application = LocalContext.current.applicationContext as AdoptaPetApp
+    val factory = AppViewModelFactory(application.repository)
+
+    // Creamos los ViewModels USANDO la fábrica
+    val mascotaViewModel: MascotaViewModel = viewModel(factory = factory)
+    val formularioViewModel: FormularioViewModel = viewModel(factory = factory)
+
+    // --- FIN DEL PEGAMENTO ---
+
+    // 4. Creamos el NavHost (tu mapa de navegación)
+    NavHost(navController = navController, startDestination = "feed") {
+
         composable(route = "feed") {
-            FeedScreen(/* navController = navController */)
+            // 5. ¡Le pasamos el VM y el NavController a tu pantalla!
+            FeedScreen(
+                navController = navController,
+                viewModel = mascotaViewModel
+            )
         }
 
-        // Ruta 2: Agregar Mascota
         composable(route = "agregar") {
-            AgregarMascotaScreen(/* navController = navController */)
+            // 6. ¡Le pasamos el VM y el NavController a tu otra pantalla!
+            AgregarMascotaScreen(
+                navController = navController,
+                viewModel = formularioViewModel
+            )
         }
 
-        // Ruta 3: Detalle de Mascota (con parámetro)
         composable(route = "detalle/{mascotaId}") {
-            DetalleMascotaScreen(/* navController = navController */)
+                backStackEntry -> // <-- backStackEntry tiene los argumentos
+            // 1. Extraemos el "mascotaId" de la ruta (viene como texto)
+            val idString = backStackEntry.arguments?.getString("mascotaId")
+            // 2. Lo convertimos a número (Int). Si falla, usamos 0.
+            val id = idString?.toIntOrNull() ?: 0
+
+            // 3. ¡Le pasamos el ID extraído a tu pantalla!
+            DetalleMascotaScreen(
+                navController = navController,
+                viewModel = mascotaViewModel,
+                mascotaId = id // <-- Aquí le pasas el ID
+            )
+        }
         }
     }
-}
