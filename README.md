@@ -40,7 +40,7 @@ AdoptaPet es una plataforma funcional que simula un sistema para poner mascotas 
 1. Android Studio (última versión estable)
 2. JDK 11 o superior
 3. Dispositivo Android o emulador con API 24+
-4. Clonar este repositorio: `git clone [URL_DEL_REPO]`
+4. Clonar este repositorio: `https://github.com/Ijnacio/AdoptaPet`
 
 
 ---
