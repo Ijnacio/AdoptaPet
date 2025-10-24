@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Mascota::class, Solicitud::class], version = 2)
+@Database(entities = [Mascota::class, Solicitud::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun mascotaDao(): MascotaDao
@@ -49,12 +49,12 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        suspend fun populateDatabase(mascotaDao: MascotaDao) {
+        private suspend fun populateDatabase(mascotaDao: MascotaDao) {
 
             val mascota1 = Mascota(
                 nombre = "Brisa",
                 tipo = "Perro",
-                fotoUri = "https://i.imgur.com/gPz2kGz.jpeg",
+                fotoUri = "https://i5.walmartimages.com/asr/2b1ae954-9915-4f96-bc11-b279a6c07c93.85d1648e0862d9d81fed4633d993686e.png?odnHeight=612&odnWidth=612&odnBg=FFFFFF",
                 raza = "Kiltro Mestizo",
                 edad = 2,
                 vacunasAlDia = true,
@@ -82,7 +82,7 @@ abstract class AppDatabase : RoomDatabase() {
             val mascota3 = Mascota(
                 nombre = "Tambor",
                 tipo = "Conejo",
-                fotoUri = "https://i.imgur.com/S56s1mE.jpeg",
+                fotoUri = "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRpgpxBiQckHcUKdch28aGlqhj217J-_4NZ6sWuWvkl3dyyaiq8kNipO8vHz76L6_ZLlLe8QG9hEaR1KlCYhDUh9sJFnG6y3ZWCOsCAfFs",
                 raza = "Cabeza de León",
                 edad = 1,
                 vacunasAlDia = true,
@@ -96,7 +96,7 @@ abstract class AppDatabase : RoomDatabase() {
             val mascota4 = Mascota(
                 nombre = "Maní",
                 tipo = "Hámster/Roedor",
-                fotoUri = "https://i.imgur.com/tqR1M3P.jpeg",
+                fotoUri = "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQQfz4RBHj8jagtLHzmG411hB627224SnCrNNW8pCoQG3mOKMhVR-guRTM35qHIejHOW_B6hCFt1rIVjn95VpBAMc9AKfiqd5Sqng0NkZg",
                 raza = "Sirio",
                 edad = 1,
                 vacunasAlDia = false,
@@ -110,7 +110,7 @@ abstract class AppDatabase : RoomDatabase() {
             val mascota5 = Mascota(
                 nombre = "Cuco",
                 tipo = "Reptil (Exótico)",
-                fotoUri = "https://i.imgur.com/K3Zp0f6.jpeg",
+                fotoUri = "https://misanimales.com/wp-content/uploads/2016/01/animales-exoticos-reptiles.jpg",
                 raza = "Lagartija Verde",
                 edad = 1,
                 vacunasAlDia = false,

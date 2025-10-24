@@ -2,11 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permisos y Features -->
+    <!-- PERMISO DE INTERNET  -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Permiso de Cámara -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- Feature de Cámara (opcional) -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".AdoptaPetApp"
@@ -19,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AdoptaPet">
 
-        <!-- Tu MainActivity -->
+        <!-- MainActivity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

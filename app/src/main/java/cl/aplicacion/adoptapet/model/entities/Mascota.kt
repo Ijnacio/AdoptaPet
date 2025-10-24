@@ -1,5 +1,5 @@
 package cl.aplicacion.adoptapet.model.entities
-// (Asegúrate de importar 'androidx.room.Entity' y 'androidx.room.PrimaryKey')
+
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,10 +10,10 @@ data class Mascota(
 
     // Datos de la mascota
     val nombre: String,
-    val raza: String,
-    val descripcion: String,
     val tipo: String,
+    val raza: String,
     val edad: Int,
+    val descripcion: String,
     val vacunasAlDia: Boolean,
     val motivoAdopcion: String,
 
@@ -21,7 +21,6 @@ data class Mascota(
     val nombreContacto: String,
     val telefonoContacto: String,
 
-    // Foto URI
-    val fotoUri: String,
-
-    )
+    // Foto URI (puede ser URL de internet o URI local)
+    val fotoUri: String
+)

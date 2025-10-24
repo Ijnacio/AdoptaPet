@@ -1,7 +1,6 @@
 package cl.aplicacion.adoptapet.ui.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,7 +36,6 @@ fun FeedScreen(
 
     Scaffold(
         topBar = {
-            // Barra superior con título
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.surface,
@@ -146,7 +144,7 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
                     contentScale = ContentScale.Crop
                 )
 
-                // Badge del tipo de animal (esquina superior derecha)
+                // Badge del tipo de animal
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -180,7 +178,6 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Badge de edad
                     Surface(
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.secondaryContainer
@@ -197,7 +194,6 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Raza
                 Text(
                     text = "Raza: ${mascota.raza}",
                     style = MaterialTheme.typography.bodyLarge,
@@ -206,22 +202,17 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Descripción (limitada)
                 Text(
                     text = mascota.descripcion,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    modifier = Modifier.fillMaxWidth()
+                    maxLines = 2
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Estado de vacunas
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = if (mascota.vacunasAlDia) Icons.Default.Check else Icons.Default.Close,
                         contentDescription = null,
@@ -239,14 +230,13 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Divider
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Contacto
+                // Contacto y botón
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -267,7 +257,6 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
                         )
                     }
 
-                    // Botón "Ver más"
                     Button(
                         onClick = onCardClick,
                         colors = ButtonDefaults.buttonColors(
@@ -276,10 +265,7 @@ fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text(
-                            "Ver más",
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("Ver más", fontWeight = FontWeight.Bold)
                     }
                 }
             }
