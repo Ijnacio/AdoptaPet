@@ -40,6 +40,10 @@ fun AppNavigation() {
             )
         }
 
+
+
+
+
         composable(route = "agregar") {
             // 6. ¡Le pasamos el VM y el NavController a tu otra pantalla!
             AgregarMascotaScreen(
@@ -58,9 +62,9 @@ fun AppNavigation() {
             // 3. ¡Le pasamos el ID extraído a tu pantalla!
             DetalleMascotaScreen(
                 navController = navController,
-                viewModel = mascotaViewModel,
-                mascotaId = id // <-- Aquí le pasas el ID
-            )
+                mascotaViewModel = mascotaViewModel, // Para buscar la mascota
+                formularioViewModel = formularioViewModel, // Para enviar la solicitud
+                mascotaId = id )
         }
         }
     }

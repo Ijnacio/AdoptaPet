@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [Mascota::class, Solicitud::class], version = 3, exportSchema = false)
+@Database(entities = [Mascota::class, Solicitud::class], version = 7, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun mascotaDao(): MascotaDao

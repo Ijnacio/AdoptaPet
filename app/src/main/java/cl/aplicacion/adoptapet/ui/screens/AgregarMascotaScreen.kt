@@ -230,7 +230,7 @@ fun AgregarMascotaScreen(
                 OutlinedTextField(
                     value = descripcion,
                     onValueChange = { descripcion = it },
-                    label = { Text("Descripción adicional", fontWeight = FontWeight.SemiBold) },
+                    label = { Text("Descripción de la Mascota", fontWeight = FontWeight.SemiBold) },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3, // Limita a 3 líneas
                     colors = OutlinedTextFieldDefaults.colors(
