@@ -1,8 +1,6 @@
 # 🐾 AdoptaPet (DSY1105 - Evaluación Parcial 2)
 
-"AdoptaPet" es una aplicación móvil para Android, desarrollada como parte de la Evaluación Parcial 2 de la asignatura Desarrollo de Aplicaciones Móviles (DSY1105).
-
-AdoptaPet es una plataforma funcional que simula un sistema para poner mascotas en adopción y permitir que usuarios postulen para adoptarlas, integrando los conceptos clave de desarrollo móvil moderno con Kotlin y Jetpack Compose.
+AdoptaPet es una aplicación móvil para Android que simula una plataforma funcional para poner mascotas en adopción y permitir que usuarios postulen para adoptarlas. El proyecto integra los conceptos clave de desarrollo móvil moderno con Kotlin y Jetpack Compose.
 
 ---
 
