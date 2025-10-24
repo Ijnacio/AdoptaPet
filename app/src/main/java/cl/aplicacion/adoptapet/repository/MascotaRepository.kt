@@ -26,7 +26,6 @@ class MascotaRepository(
         mascotaDao.insertarMascota(mascota)
     }
 
-    // --- Funciones para Solicitud ---
     suspend fun insertarSolicitud(solicitud: Solicitud) {
         solicitudDao.insertarSolicitud(solicitud)
     }

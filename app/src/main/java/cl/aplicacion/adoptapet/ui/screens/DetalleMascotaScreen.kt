@@ -53,8 +53,16 @@ fun DetalleMascotaScreen(
     var nombreAdoptante by remember { mutableStateOf("") }
     var direccionAdoptante by remember { mutableStateOf("") }
     var tipoVivienda by remember { mutableStateOf("Casa") }
-    var rangoSueldo by remember { mutableStateOf("Menos de 500mil") }
-    val opcionesSueldo = listOf("Menos de 500mil", "500mil - 1 millón", "Más de 1 millón")
+    var rangoSueldo by remember { mutableStateOf("Menos de 400mil") }
+    val opcionesSueldo = listOf(
+        "Menos de 200mil",
+        "200mil - 400mil",
+        "400mil - 600mil",
+        "600mil - 800mil",
+        "800mil - 1 millón",
+    )
+
+
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -239,9 +247,10 @@ fun DetalleMascotaScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                            containerColor = MaterialTheme.colorScheme.surface
                         ),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
@@ -262,6 +271,26 @@ fun DetalleMascotaScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    "¡Mira a ${pet.nombre}! Es un ${pet.tipo.lowercase()} ${pet.raza} de ${pet.edad} años en adopción. 🐾 Más info en AdoptaPet."
+                                )
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, "Compartir Mascota")
+                            context.startActivity(shareIntent)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Compartir con un Amigo", fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(32.dp))
@@ -412,27 +441,6 @@ fun DetalleMascotaScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    OutlinedButton(
-                        onClick = {
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(
-                                    Intent.EXTRA_TEXT,
-                                    "¡Mira a ${pet.nombre}! Es un ${pet.tipo.lowercase()} ${pet.raza} de ${pet.edad} años en adopción. 🐾 Más info en AdoptaPet."
-                                )
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, "Compartir Mascota")
-                            context.startActivity(shareIntent)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Compartir con un Amigo", fontWeight = FontWeight.Bold)
-                    }
-
-                    Spacer(modifier = Modifier.height(32.dp))
                 }
             }
         }

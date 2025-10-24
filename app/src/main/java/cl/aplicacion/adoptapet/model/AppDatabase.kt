@@ -13,9 +13,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
+// tablas Mascota y Solicitud y versión 7 de la BD
 @Database(entities = [Mascota::class, Solicitud::class], version = 7, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
+
+    //interfaces para acceder a la BD
     abstract fun mascotaDao(): MascotaDao
     abstract fun solicitudDao(): SolicitudDao
 
@@ -23,6 +27,8 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        // Obtiene la instancia singleton de la BD y la crea si no existe
+        // sigleton: solo una instancia en toda la app
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -39,6 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 
+    // inserta datos semilla al crear la BD por primera vez
     private class AppDatabaseCallback : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
@@ -48,6 +55,8 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
         }
+
+        // Datos semilla 5 ejemplos de mascotas
 
         private suspend fun populateDatabase(mascotaDao: MascotaDao) {
 

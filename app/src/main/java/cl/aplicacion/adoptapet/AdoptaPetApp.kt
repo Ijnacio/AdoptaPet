@@ -11,12 +11,10 @@ import cl.aplicacion.adoptapet.repository.MascotaRepository
  */
 class AdoptaPetApp : Application() {
 
-    // 1. Creamos la Base de Datos (usando el código de Francisca)
-    // 'lazy' significa que solo se creará la primera vez que se necesite.
+    //  Creamos la Base de Datos, lazy para que se cree solo cuando se necesite
     private val database by lazy { AppDatabase.getDatabase(this) }
 
-    // 2. Creamos el Repositorio (y le pasamos los DAOs de la DB)
-    //    Este 'repository' será público para que los ViewModels lo usen.
+    // 2. Creamos el Repositorio para la BD, el repo sera el intermediario entre la BD y los ViewModels
     val repository by lazy {
         MascotaRepository(database.mascotaDao(), database.solicitudDao())
     }

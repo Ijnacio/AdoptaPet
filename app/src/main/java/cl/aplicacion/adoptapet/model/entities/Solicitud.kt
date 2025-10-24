@@ -8,9 +8,10 @@ data class Solicitud(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    val idMascota: Int, // ID de la mascota
+    val idMascota: Int,
     val nombreCompleto: String,
     val direccion: String,
-    val tipoVivienda: String, // "Casa" o "Depto"
-    val rangoSueldo: String // "Menos de 500mil", "500mil - 1 millón", "Más de 1 millón"
+    val tipoVivienda: String,
+    val rangoSueldo: String
+
 )

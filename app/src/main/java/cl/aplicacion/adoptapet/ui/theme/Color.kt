@@ -2,7 +2,7 @@ package cl.aplicacion.adoptapet.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// --- Definimos nuestros colores pasteles ---
+//Definimos nuestros colores pasteles
 
 val NaranjoPastel = Color(0xFFFDECDD)
 val NaranjoFuerte = Color(0xFFF9A86E)

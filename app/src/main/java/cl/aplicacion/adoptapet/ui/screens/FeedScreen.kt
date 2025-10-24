@@ -26,6 +26,19 @@ import androidx.navigation.NavHostController
 import cl.aplicacion.adoptapet.model.entities.Mascota
 import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
 import coil.compose.AsyncImage
+///
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.shrinkOut
+
 
 @Composable
 fun FeedScreen(
@@ -33,6 +46,18 @@ fun FeedScreen(
     viewModel: MascotaViewModel
 ) {
     val mascotas by viewModel.mascotas.collectAsState()
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+// Mostrar SOLO cuando llegas al final
+    val atBottom by remember {
+        derivedStateOf {
+            val info = listState.layoutInfo
+            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val total = info.totalItemsCount
+            total > 0 && lastVisible >= total - 1
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -56,15 +81,38 @@ fun FeedScreen(
                 }
             }
         },
+        ///FAB (derecha-abajo): "Subir" (cuando llegue al final) + "Agregar" (siempre visible)
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("agregar") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Agregar Mascota")
+                // boton “Subir”
+                AnimatedVisibility(
+                    visible = atBottom,
+                    enter = fadeIn() + expandIn(),
+                    exit  = fadeOut() + shrinkOut()
+                ) {
+                    FloatingActionButton(
+                        onClick = { scope.launch { listState.animateScrollToItem(0) } },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ) {
+                        Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Subir")
+                    }
+                }
+
+                // boton “Agregar”
+                FloatingActionButton(
+                    onClick = { navController.navigate("agregar") },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Agregar Mascota")
+                }
             }
         },
+
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
 
@@ -99,6 +147,7 @@ fun FeedScreen(
         } else {
             // Lista de mascotas
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),

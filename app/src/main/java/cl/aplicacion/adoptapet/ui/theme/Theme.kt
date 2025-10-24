@@ -16,41 +16,41 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// 1. Esta es la paleta para MODO OSCURO
+// Esta es la paleta para el MODO OSCURO
 private val DarkColorPalette = darkColorScheme(
     primary = NaranjoFuerte,
     secondary = VerdeFuerte,
     tertiary = VerdeAgua,
-    background = TextoOscuro, // Fondo oscuro
+    background = TextoOscuro,
     surface = GrisClaro,
     onPrimary = Color.Black,
     onSecondary = Color.Black,
     onTertiary = Color.Black,
-    onBackground = Color.White, // Texto blanco
+    onBackground = Color.White,
     onSurface = TextoOscuro,
 )
 
-// 2. Esta es la paleta para MODO CLARO (la principal)
+//  Esta es la paleta para MODO CLARO (la principal)
 private val LightColorPalette = lightColorScheme(
-    primary = NaranjoFuerte,    // Color principal (botones, etc.)
-    secondary = VerdeFuerte,  // Color secundario
-    tertiary = VerdeAgua,     // Color de acento
-    background = NaranjoPastel, // Color de fondo de la app
-    surface = GrisClaro,      // Color de las "Cards"
+    primary = NaranjoFuerte,
+    secondary = VerdeFuerte,
+    tertiary = VerdeAgua,
+    background = NaranjoPastel,
+    surface = GrisClaro,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = TextoOscuro,
-    onBackground = TextoOscuro, // Color del texto sobre el fondo
+    onBackground = TextoOscuro,
     onSurface = TextoOscuro,
 )
 
 @Composable
 fun AdoptaPetTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // <-- Se puede cambiar esto a 'true' si quieres colores dinámicos
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    // 3. Aquí se decide qué paleta usar (Modo Claro u Oscuro)
+    // Aquí se decide qué paleta usar (Modo Claro u Oscuro)
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
