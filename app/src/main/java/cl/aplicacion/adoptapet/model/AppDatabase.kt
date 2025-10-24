@@ -4,34 +4,122 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import cl.aplicacion.adoptapet.model.dao.MascotaDao
 import cl.aplicacion.adoptapet.model.dao.SolicitudDao
 import cl.aplicacion.adoptapet.model.entities.Mascota
 import cl.aplicacion.adoptapet.model.entities.Solicitud
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-@Database(entities = [Mascota::class, Solicitud::class], version = 1)
+@Database(entities = [Mascota::class, Solicitud::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
-    // Definimos una función abstracta para CADA DAO que tengamos
     abstract fun mascotaDao(): MascotaDao
     abstract fun solicitudDao(): SolicitudDao
 
     companion object {
-        // @Volatile asegura que el valor de INSTANCE esté siempre actualizado
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
         fun getDatabase(context: Context): AppDatabase {
-            // "synchronized" evita que dos hilos intenten crear la DB al mismo tiempo
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "adoptapet_database" // Nombre del archivo de la DB
-                ).build()
+                    "adoptapet_database"
+                )
+                    .addCallback(AppDatabaseCallback())
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
+        }
+    }
+
+    private class AppDatabaseCallback : RoomDatabase.Callback() {
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
+            INSTANCE?.let { database ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    populateDatabase(database.mascotaDao())
+                }
+            }
+        }
+
+        suspend fun populateDatabase(mascotaDao: MascotaDao) {
+
+            val mascota1 = Mascota(
+                nombre = "Brisa",
+                tipo = "Perro",
+                fotoUri = "https://i.imgur.com/gPz2kGz.jpeg",
+                raza = "Kiltro Mestizo",
+                edad = 2,
+                vacunasAlDia = true,
+                motivoAdopcion = "Encontrada en la calle",
+                descripcion = "Muy juguetona y amigable. Le encanta correr.",
+                nombreContacto = "Fundación Patitas",
+                telefonoContacto = "912345678"
+            )
+            mascotaDao.insertarMascota(mascota1)
+
+            val mascota2 = Mascota(
+                nombre = "Milo",
+                tipo = "Gato",
+                fotoUri = "https://cloudfront-us-east-1.images.arcpublishing.com/abccolor/L5KTZNPZI5D7HEGBMF335RC3MM.jpg",
+                raza = "Siamés",
+                edad = 1,
+                vacunasAlDia = false,
+                motivoAdopcion = "Dueño se muda de país",
+                descripcion = "Tranquilo y le gusta dormir. Ideal para depto.",
+                nombreContacto = "Ana Gómez",
+                telefonoContacto = "987654321"
+            )
+            mascotaDao.insertarMascota(mascota2)
+
+            val mascota3 = Mascota(
+                nombre = "Tambor",
+                tipo = "Conejo",
+                fotoUri = "https://i.imgur.com/S56s1mE.jpeg",
+                raza = "Cabeza de León",
+                edad = 1,
+                vacunasAlDia = true,
+                motivoAdopcion = "Hija desarrolló alergia",
+                descripcion = "Muy tierno y tranquilo. Le gusta la zanahoria.",
+                nombreContacto = "Familia Pérez",
+                telefonoContacto = "911112222"
+            )
+            mascotaDao.insertarMascota(mascota3)
+
+            val mascota4 = Mascota(
+                nombre = "Maní",
+                tipo = "Hámster/Roedor",
+                fotoUri = "https://i.imgur.com/tqR1M3P.jpeg",
+                raza = "Sirio",
+                edad = 1,
+                vacunasAlDia = false,
+                motivoAdopcion = "Falta de tiempo para cuidarlo",
+                descripcion = "Pequeño y curioso. Activo principalmente de noche.",
+                nombreContacto = "Luis Soto",
+                telefonoContacto = "933334444"
+            )
+            mascotaDao.insertarMascota(mascota4)
+
+            val mascota5 = Mascota(
+                nombre = "Cuco",
+                tipo = "Reptil (Exótico)",
+                fotoUri = "https://i.imgur.com/K3Zp0f6.jpeg",
+                raza = "Lagartija Verde",
+                edad = 1,
+                vacunasAlDia = false,
+                motivoAdopcion = "Dueño ya no puede cuidarlo",
+                descripcion = "Come insectos, necesita terrario con calor.",
+                nombreContacto = "Carlos Ruiz",
+                telefonoContacto = "955556666"
+            )
+            mascotaDao.insertarMascota(mascota5)
         }
     }
 }

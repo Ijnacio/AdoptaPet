@@ -1,29 +1,32 @@
 package cl.aplicacion.adoptapet.ui.screens
 
-import android.Manifest // Necesario para el permiso de cámara
+import android.Manifest
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.* // Import genérico para Layouts
-import androidx.compose.foundation.rememberScrollState // Para hacer scroll si el contenido es largo
-import androidx.compose.foundation.verticalScroll // Para hacer scroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.* // Import genérico para Runtime (remember, mutableStateOf, etc.)
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cl.aplicacion.adoptapet.model.entities.Mascota
 import cl.aplicacion.adoptapet.viewmodel.FormularioViewModel
 import kotlinx.coroutines.launch
-import androidx.core.content.FileProvider // Necesario para crear la URI segura
-import coil.compose.rememberAsyncImagePainter // Necesario para mostrar la foto desde URI
+import androidx.core.content.FileProvider
+import coil.compose.rememberAsyncImagePainter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -36,176 +39,344 @@ fun AgregarMascotaScreen(
     viewModel: FormularioViewModel
 ) {
 
-    // --- 1. LÓGICA DE LA CÁMARA (CON MANEJO DE PERMISOS) ---
-
-    // Variable para guardar el "link" (URI) a la foto. Inicia vacía (null).
+    // --- LÓGICA DE LA CÁMARA ---
     var photoUri: Uri? by remember { mutableStateOf(null) }
-    val context = LocalContext.current // Contexto necesario para Toast y FileProvider
+    val context = LocalContext.current
 
-    // Función auxiliar para crear un archivo temporal y obtener su URI segura
     fun getTmpFileUri(): Uri {
         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        // Directorio temporal privado de la app
         val storageDir: File? = context.getExternalFilesDir(null)
         val tmpFile = File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir).apply {
-            // Asegura que el archivo exista y se borre al salir (opcional)
             createNewFile()
             deleteOnExit()
         }
-        // Crea una URI segura tipo "content://" usando FileProvider
-        return FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            // IMPORTANTE: Esta "dirección" debe coincidir con la del AndroidManifest.xml
-            "${context.packageName}.provider",
-            tmpFile
-        )
+        return FileProvider.getUriForFile(Objects.requireNonNull(context),"${context.packageName}.provider", tmpFile)
     }
 
-    // "Launcher" para ABRIR LA CÁMARA y guardar la foto en la URI que le pasemos
     val takePictureLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(), // Contrato que guarda la foto
-        onResult = { success -> // Resultado: ¿Se guardó la foto?
-            if (success) {
-                // Si sí, 'photoUri' ya tiene el link correcto. La UI se actualizará sola.
-                Toast.makeText(context, "Foto capturada", Toast.LENGTH_SHORT).show()
-            } else {
-                // Si el usuario canceló, limpiamos la URI
-                Toast.makeText(context, "Captura cancelada", Toast.LENGTH_SHORT).show()
-                photoUri = null
-            }
-        }
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success -> if (!success) photoUri = null }
     )
 
-    // "Launcher" para PEDIR PERMISO de cámara
     val requestPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(), // Contrato para pedir UN permiso
-        onResult = { isGranted: Boolean -> // Resultado: ¿Dio permiso?
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
             if (isGranted) {
-                // SI dio permiso: Creamos la URI y AHORA SÍ lanzamos la cámara
                 val uri = getTmpFileUri()
-                photoUri = uri // Guardamos la URI para mostrarla y usarla al guardar
-                takePictureLauncher.launch(uri) // Lanzamos el OTRO launcher
+                photoUri = uri
+                takePictureLauncher.launch(uri)
             } else {
-                // NO dio permiso: Mostramos mensaje
-                Toast.makeText(context, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
             }
         }
     )
 
-    // --- VARIABLES PARA EL ESTADO DEL FORMULARIO ---
+    // --- VARIABLES DE ESTADO ---
+    // Campos Mascota
     var nombre by remember { mutableStateOf("") }
     var raza by remember { mutableStateOf("") }
+    var tipoMascota by remember { mutableStateOf("Perro") }
+    var edad by remember { mutableStateOf("") }
+    var vacunasAlDia by remember { mutableStateOf(false) }
+    var motivoAdopcion by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
-    // (Añade aquí las otras variables: edad, vacunas (Boolean), motivo, etc.)
+    // Lista de tipos de animales
+    val tiposDeAnimales = listOf("Perro", "Gato", "Conejo", "Pájaro", "Otro")
 
-    // --- SCOPE PARA LA CORUTINA DE GUARDADO ---
-    val scope = rememberCoroutineScope() // Necesario para llamar a funciones 'suspend'
+    // Campos Contacto
+    var nombreContacto by remember { mutableStateOf("") }
+    var telefonoContacto by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
-    // --- DISEÑO DE LA PANTALLA (UI) ---
-    // Usamos verticalScroll para que el formulario se pueda desplazar si no cabe
+    // --- UI ---
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()), // Permite hacer scroll
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
-        // Quitamos verticalArrangement.Center para que el scroll funcione bien
     ) {
 
-        Text("Agregar Nueva Mascota", style = MaterialTheme.typography.titleLarge)
+        // TÍTULO PRINCIPAL
+        Text(
+            "Agregar Nueva Mascota",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- EL FORMULARIO ---
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth() // Ocupa todo el ancho
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = raza,
-            onValueChange = { raza = it },
-            label = { Text("Raza") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") },
+        // --- SECCIÓN: DATOS DE LA MASCOTA ---
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            maxLines = 3
-        )
-        // (Añade aquí los otros OutlinedTextField para edad, motivoAdopcion, etc.)
-        // (Añade un Checkbox para vacunasAlDia)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Datos de la Mascota",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Nombre
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre*", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors( // Colores de los bordes jeje
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Raza
+                OutlinedTextField(
+                    value = raza,
+                    onValueChange = { raza = it },
+                    label = { Text("Raza", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Tipo de Animal (Radio Buttons)
+                Text(
+                    "Tipo de Animal*:",
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+
+                Column(Modifier.fillMaxWidth()) {
+                    tiposDeAnimales.forEach { tipo ->
+                        Row( // Fila para cada opción
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { tipoMascota = tipo }
+                                .padding(vertical = 4.dp)
+                        ) {
+                            RadioButton(
+                                selected = (tipoMascota == tipo),
+                                onClick = { tipoMascota = tipo }
+                            )
+                            Text(
+                                tipo,
+                                modifier = Modifier.padding(start = 8.dp),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // edad
+                OutlinedTextField(
+                    value = edad,
+                    onValueChange = { edad = it.filter { c -> c.isDigit() } }, // Solo permite dígitos
+                    label = { Text("Edad (años)", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // Teclado numérico
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // vacunas al día
+                Row(
+                    verticalAlignment = Alignment.CenterVertically, // Alinea  el checkbox y el texto
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { vacunasAlDia = !vacunasAlDia }// Permite hacer clic en todo el row
+                        .padding(vertical = 8.dp)
+                ) {
+                    Checkbox(
+                        checked = vacunasAlDia,
+                        onCheckedChange = { vacunasAlDia = it }
+                    )
+                    Text(
+                        "¿Tiene las vacunas al día?",
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // motivo de adopción
+                OutlinedTextField(
+                    value = motivoAdopcion,
+                    onValueChange = { motivoAdopcion = it },
+                    label = { Text("Motivo de la adopción", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // descripción adicional
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { descripcion = it },
+                    label = { Text("Descripción adicional", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3, // Limita a 3 líneas
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- BOTÓN DE CÁMARA (Llama al launcher de permisos) ---
-        Button(onClick = {
-            // Pide permiso. Si lo dan, el 'requestPermissionLauncher' llamará a la cámara.
-            requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }) {
-            Text("Tomar Foto")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+        // --- SECCIÓN: DATOS DE CONTACTO ---
+        Card(
+            modifier = Modifier.fillMaxWidth(), // Ocupa el ancho disponible
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), // Color de fondo de la Card
+            border = BorderStroke(3.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)) // Borde de la Card
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) { // el paddin separa el contenido del borde
+                Text(
+                    "Datos de Contacto",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                // Nombre Contacto
+                OutlinedTextField(
+                    value = nombreContacto,
+                    onValueChange = { nombreContacto = it },
+                    label = { Text("Nombre Contacto*", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+                Spacer(modifier = Modifier.height(12.dp))
 
-        // --- BOTÓN DE GUARDAR (Llama al ViewModel) ---
+                // Teléfono Contacto
+                OutlinedTextField(
+                    value = telefonoContacto,
+                    onValueChange = { telefonoContacto = it.filter { c -> c.isDigit() } },
+                    label = { Text("Teléfono Contacto*", fontWeight = FontWeight.SemiBold) },
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- SECCIÓN: FOTO ---
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), // Color de fondo de la Card
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)) // eL color podemos cambiarlo en otro commit jeje
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Foto de la Mascota",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                photoUri?.let { uri ->
+                    Image(
+                        painter = rememberAsyncImagePainter(uri),
+                        contentDescription = "Foto previsualización",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(bottom = 16.dp)
+                    )
+                    Text(
+                        "✓ Foto lista",
+                        color = Color.Green,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                Button(
+                    onClick = { requestPermissionLauncher.launch(Manifest.permission.CAMERA) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        if (photoUri == null) "Tomar Foto*" else "Cambiar Foto",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // --- BOTÓN GUARDAR ---
         Button(
             onClick = {
-                // Validación simple (puedes mejorarla)
-                if (nombre.isBlank()) {
-                    Toast.makeText(context, "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
-                } else if (photoUri == null) {
-                    Toast.makeText(context, "La foto es obligatoria", Toast.LENGTH_SHORT).show()
-                } else {
-                    // 1. Crea el objeto Mascota con los datos del formulario
-                    val nuevaMascota = Mascota(
-                        // ID es 0 porque Room lo genera
-                        nombre = nombre,
-                        raza = raza,
-                        descripcion = descripcion,
-                        fotoUri = photoUri.toString(), // ¡Guarda la URI como texto!
-                        edad = 2, // Reemplaza con el valor del TextField de edad
-                        vacunasAlDia = true, // Reemplaza con el valor del Checkbox
-                        motivoAdopcion = "Encontrado", // Reemplaza con el TextField
-                        nombreContacto = "Dueño de Prueba", // Reemplaza con TextField
-                        telefonoContacto = "912345678" // Reemplaza con TextField
-                    )
+                // Validación de campos obligatorios , dsp tenemos que agregar la advertencia en grande
+                when {
+                    nombre.isBlank() -> Toast.makeText(context, "El Nombre es obligatorio", Toast.LENGTH_LONG).show() // Mensaje de error si el nombre está vacío
+                    tipoMascota.isBlank() -> Toast.makeText(context, "El Tipo de Animal es obligatorio", Toast.LENGTH_LONG).show() // Mensaje de error si el tipo de animal no está seleccionado
+                    photoUri == null -> Toast.makeText(context, "La Foto es obligatoria", Toast.LENGTH_LONG).show() // Mensaje de error si no se ha tomado una foto
+                    nombreContacto.isBlank() -> Toast.makeText(context, "El Nombre de Contacto es obligatorio", Toast.LENGTH_LONG).show() // Mensaje de error si el nombre de contacto está vacío
+                    telefonoContacto.isBlank() -> Toast.makeText(context, "El Teléfono de Contacto es obligatorio", Toast.LENGTH_LONG).show()// Mensaje de error si el teléfono de contacto está vacío
 
-                    // 2. Llama al ViewModel para guardar (en segundo plano)
-                    scope.launch {
-                        viewModel.agregarMascota(nuevaMascota)
+                    else -> {
+                        val nuevaMascota = Mascota(
+                            nombre = nombre,
+                            raza = raza,
+                            descripcion = descripcion,
+                            tipo = tipoMascota,
+                            edad = edad.toIntOrNull() ?: 0,
+                            vacunasAlDia = vacunasAlDia,
+                            motivoAdopcion = motivoAdopcion,
+                            nombreContacto = nombreContacto,
+                            telefonoContacto = telefonoContacto,
+                            fotoUri = photoUri.toString()
+                        )
+                        scope.launch { viewModel.agregarMascota(nuevaMascota) } // Guarda la nueva mascota en la base de datos
+                        Toast.makeText(context, "Mascota ${nuevaMascota.nombre} guardada", Toast.LENGTH_SHORT).show() // Mensaje de éxito
+                        navController.popBackStack() // Regresa a la pantalla anterior
                     }
-
-                    // 3. Muestra mensaje de éxito
-                    Toast.makeText(context, "Mascota Guardada", Toast.LENGTH_SHORT).show()
-
-                    // 4. Vuelve a la pantalla anterior (Feed)
-                    navController.popBackStack()
-
-                    // (La limpieza de campos ya no es necesaria aquí porque volvemos atrás)
                 }
             },
-            // Deshabilita el botón si no se ha tomado la foto
-            enabled = photoUri != null
+            enabled = nombre.isNotBlank() && tipoMascota.isNotBlank() && photoUri != null && nombreContacto.isNotBlank() && telefonoContacto.isNotBlank(), // Habilita el botón solo si los campos obligatorios están llenos
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
         ) {
-            Text("Guardar Mascota")
+            Text(
+                "GUARDAR MASCOTA",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-        // --- VISOR DE LA FOTO CAPTURADA ---
-        // Muestra la imagen si 'photoUri' no es null
-        photoUri?.let { uri ->
-            Text("Foto lista para guardar:")
-            Image(
-                // Coil carga la imagen desde la URI (link al archivo temporal)
-                painter = rememberAsyncImagePainter(uri),
-                contentDescription = "Foto de la mascota",
-                modifier = Modifier.size(200.dp) // Tamaño de la previsualización
-            )
-        }
-    } // Fin Column
+    }
 }

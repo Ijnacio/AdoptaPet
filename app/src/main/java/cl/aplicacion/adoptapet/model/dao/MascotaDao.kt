@@ -12,12 +12,9 @@ interface MascotaDao {
     @Insert
     suspend fun insertarMascota(mascota: Mascota)
 
-    // @Query: Aquí escribimos la consulta SQL
-    // Esta función obtiene TODAS las mascotas y las ordena (DESC = descendente)
     @Query("SELECT * FROM mascota ORDER BY id DESC")
     fun getAllMascotas(): Flow<List<Mascota>>
 
-    // Esta función obtiene UNA mascota específica por su ID
     @Query("SELECT * FROM mascota WHERE id = :idMascota")
     fun getMascotaById(idMascota: Int): Flow<Mascota>
 }
