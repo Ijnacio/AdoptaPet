@@ -13,7 +13,7 @@ AdoptaPet es una aplicación móvil para Android que simula una plataforma funci
 
 ## 🚀 Funcionalidades (Versión 1)
 
-[cite_start]Esta versión (V1) del proyecto cumple con los siguientes requisitos obligatorios de la rúbrica [cite: 38-49]:
+Esta versión (V1) del proyecto cumple con los siguientes requisitos obligatorios de la rúbrica 
 
 - Arquitectura MVVM: Implementación completa del patrón Modelo-Vista-ViewModel para separación de responsabilidades
 - Persistencia Local con Room: Base de datos SQLite local para almacenar mascotas y solicitudes de adopción
