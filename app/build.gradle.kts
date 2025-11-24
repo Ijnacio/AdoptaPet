@@ -63,4 +63,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.coil.compose)
+
+    // --- CONEXIÓN A XANO ---
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }
