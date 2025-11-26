@@ -2,6 +2,7 @@ package cl.aplicacion.adoptapet.model.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import cl.aplicacion.adoptapet.model.entities.Mascota
 import kotlinx.coroutines.flow.Flow
@@ -9,9 +10,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface MascotaDao {
 
-    @Insert
-    suspend fun insertarMascota(mascota: Mascota)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertarMascota(mascota: Mascota)
+    @Query("DELETE FROM mascota")
+    suspend fun borrarTodo()
+
+    // CONSULTAS
     @Query("SELECT * FROM mascota ORDER BY id DESC")
     fun getAllMascotas(): Flow<List<Mascota>>
 

@@ -32,6 +32,7 @@ import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetalleMascotaScreen(
@@ -272,6 +273,38 @@ fun DetalleMascotaScreen(
                             )
                         }
                     }
+
+
+                    // --- BOTÓN WHATSAPP (NUEVO) ---
+                    Button(
+                        onClick = {
+                            try {
+                                // Limpiamos el número para dejar solo dígitos
+                                val numeroLimpio = pet.telefonoContacto.filter { it.isDigit() }
+
+                                // Mensaje predefinido
+                                val mensaje = "Hola! Vi a ${pet.nombre} en AdoptaPet y me interesa adoptarlo/a. 🐾"
+
+                                // Intent para abrir WhatsApp
+                                val url = "https://api.whatsapp.com/send?phone=569$numeroLimpio&text=$mensaje"
+                                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(url))
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF25D366), // Verde WhatsApp
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        // Puedes usar un ícono si tienes, si no texto está bien
+                        Text("Contactar Dueño por WhatsApp 💬", fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
                     Spacer(modifier = Modifier.height(24.dp))
                     OutlinedButton(
                         onClick = {

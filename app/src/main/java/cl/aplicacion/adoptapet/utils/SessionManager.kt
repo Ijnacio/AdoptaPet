@@ -1,14 +1,23 @@
 package cl.aplicacion.adoptapet.utils
 
 object SessionManager {
-    // Aquí guardaremos el nombre del usuario temporalmente
-    var usuarioActual: String? = null
+    // Datos del usuario en sesión
+    var nombreUsuario: String? = null
+    var correoUsuario: String? = null
 
-    fun isLogged(): Boolean {
-        return !usuarioActual.isNullOrBlank()
+    // Estado de conexión
+    fun isLoggedIn(): Boolean {
+        return !nombreUsuario.isNullOrBlank()
+    }
+
+    // "Login": Guardamos los datos en memoria
+    fun login(nombre: String, correo: String) {
+        nombreUsuario = nombre
+        correoUsuario = correo
     }
 
     fun logout() {
-        usuarioActual = null
+        nombreUsuario = null
+        correoUsuario = null
     }
 }

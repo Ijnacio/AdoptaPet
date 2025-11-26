@@ -13,28 +13,32 @@ import cl.aplicacion.adoptapet.ui.screens.FeedScreen
 import cl.aplicacion.adoptapet.viewmodel.AppViewModelFactory
 import cl.aplicacion.adoptapet.viewmodel.FormularioViewModel
 import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
+import cl.aplicacion.adoptapet.ui.screens.LoginScreen
 
 @Composable
 fun AppNavigation() {
 
-    //controlador principal de navegación
+    // Controlador principal de navegación
     val navController = rememberNavController()
 
-    //obtenemos la app y la factory para los ViewModels
-
+    // Obtenemos la app y la factory para los ViewModels
     val application = LocalContext.current.applicationContext as AdoptaPetApp
     val factory = AppViewModelFactory(application.repository)
 
     // VIEWMODELS: se comparten entre pantallas dentro de este NavHost
-
     val mascotaViewModel: MascotaViewModel = viewModel(factory = factory)
     val formularioViewModel: FormularioViewModel = viewModel(factory = factory)
 
+    // Define destinos (routes) y pantallas
+    // INICIO: "login"
+    NavHost(navController = navController, startDestination = "login") {
 
-    // define destinos (routes) y pantallas
-    NavHost(navController = navController, startDestination = "feed") {
+        // PANTALLA 1: LOGIN
+        composable(route = "login") {
+            LoginScreen(navController = navController)
+        }
 
-        // se conecta al feed de mascotas
+        // PANTALLA 2: FEED (Lista de mascotas)
         composable(route = "feed") {
             FeedScreen(
                 navController = navController,
@@ -42,7 +46,6 @@ fun AppNavigation() {
             )
         }
 
-        // agregar mascota
         composable(route = "agregar") {
             AgregarMascotaScreen(
                 navController = navController,
@@ -50,12 +53,12 @@ fun AppNavigation() {
             )
         }
 
-        //  detalle mascota y id como parámetro
+        // PANTALLA 4: DETALLE MASCOTA (Recibe ID como parámetro)
         composable(route = "detalle/{mascotaId}") { backStackEntry ->
             val idString = backStackEntry.arguments?.getString("mascotaId")
             val id = idString?.toIntOrNull() ?: 0
 
-            // pantalla de detalle y paso de viewmodels y id
+            // Pantalla de detalle y paso de viewmodels y id
             DetalleMascotaScreen(
                 navController = navController,
                 mascotaViewModel = mascotaViewModel,
