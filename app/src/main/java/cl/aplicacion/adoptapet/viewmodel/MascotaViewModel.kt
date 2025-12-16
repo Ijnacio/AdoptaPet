@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import cl.aplicacion.adoptapet.utils.SessionManager
 
 class MascotaViewModel(private val repository: MascotaRepository) : ViewModel() {
 
@@ -44,6 +45,19 @@ class MascotaViewModel(private val repository: MascotaRepository) : ViewModel() 
         _mascotaIdSeleccionada.value = null
     }
 
+    fun marcarComoAdoptada(id: Int) {
+        viewModelScope.launch {
+            // 1. Llamamos al repositorio (¡Aquí se quitará lo gris!)
+            repository.eliminarMascota(id)
+
+            // 2. Sumamos 1 al contador para el requisito del profe
+            SessionManager.incrementarAdopciones()
+
+            // 3. Limpiamos la selección para que la app sepa que ya no estamos viendo esa mascota
+            _mascotaIdSeleccionada.value = null
+        }
+    }
+
     // --- INICIALIZACIÓN ---
     init {
         viewModelScope.launch {
@@ -56,4 +70,6 @@ class MascotaViewModel(private val repository: MascotaRepository) : ViewModel() 
                 }
         }
     }
+
+
 }

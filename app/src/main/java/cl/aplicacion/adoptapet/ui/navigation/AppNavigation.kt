@@ -14,24 +14,24 @@ import cl.aplicacion.adoptapet.viewmodel.AppViewModelFactory
 import cl.aplicacion.adoptapet.viewmodel.FormularioViewModel
 import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
 import cl.aplicacion.adoptapet.ui.screens.LoginScreen
+import cl.aplicacion.adoptapet.utils.SessionManager // <--- IMPORTANTE: Importar esto
 
 @Composable
 fun AppNavigation() {
 
-    // Controlador principal de navegación
     val navController = rememberNavController()
 
-    // Obtenemos la app y la factory para los ViewModels
     val application = LocalContext.current.applicationContext as AdoptaPetApp
     val factory = AppViewModelFactory(application.repository)
 
-    // VIEWMODELS: se comparten entre pantallas dentro de este NavHost
     val mascotaViewModel: MascotaViewModel = viewModel(factory = factory)
     val formularioViewModel: FormularioViewModel = viewModel(factory = factory)
 
-    // Define destinos (routes) y pantallas
-    // INICIO: "login"
-    NavHost(navController = navController, startDestination = "login") {
+    val destinoInicial = if (SessionManager.isLoggedIn()) "feed" else "login"
+
+
+
+    NavHost(navController = navController, startDestination = destinoInicial) {
 
         // PANTALLA 1: LOGIN
         composable(route = "login") {

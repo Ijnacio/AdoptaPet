@@ -22,4 +22,9 @@ interface MascotaDao {
 
     @Query("SELECT * FROM mascota WHERE id = :idMascota")
     fun getMascotaById(idMascota: Int): Flow<Mascota>
+
+    // ... dentro de la interface MascotaDao
+    @Query("DELETE FROM mascota WHERE id = :id")
+    suspend fun eliminarMascota(id: Int)
+
 }

@@ -73,4 +73,24 @@ class MascotaRepository(
             }
         }
     }
+    suspend fun eliminarMascota(id: Int) {
+        // Ejecutar en segundo plano (IO)
+        withContext(Dispatchers.IO) {
+            try {
+                // 1. Llamamos al endpoint de tu imagen
+                val response = api.eliminarMascota(id)
+
+                if (response.isSuccessful) {
+                    // 2. Si Xano lo borró, lo borramos de aquí también
+                    mascotaDao.eliminarMascota(id)
+                    Log.d("REPO", "Mascota eliminada de ambos lados")
+                } else {
+                    Log.e("REPO", "Error API: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                Log.e("REPO", "Error conexión: ${e.message}")
+            }
+        }
+
+    }
 }

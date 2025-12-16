@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cl.aplicacion.adoptapet.model.entities.Mascota
 import cl.aplicacion.adoptapet.viewmodel.FormularioViewModel
-import cl.aplicacion.adoptapet.utils.SessionManager // Importante: Importar SessionManager
+import cl.aplicacion.adoptapet.utils.SessionManager
 import kotlinx.coroutines.launch
 import androidx.core.content.FileProvider
 import coil.compose.rememberAsyncImagePainter
@@ -42,8 +42,6 @@ fun AgregarMascotaScreen(
     navController: NavHostController,
     viewModel: FormularioViewModel
 ) {
-
-    // --- LÓGICA DE LA CÁMARA ---
     var photoUri: Uri? by remember { mutableStateOf(null) }
     val context = LocalContext.current
 
@@ -77,7 +75,6 @@ fun AgregarMascotaScreen(
         }
     )
 
-    // --- VARIABLES DE ESTADO ---
     var nombre by remember { mutableStateOf("") }
     var raza by remember { mutableStateOf("") }
     var tipoMascota by remember { mutableStateOf("Perro") }
@@ -91,7 +88,6 @@ fun AgregarMascotaScreen(
     var telefonoContacto by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    // --- UI ---
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,7 +103,6 @@ fun AgregarMascotaScreen(
             color = MaterialTheme.colorScheme.primary
         )
 
-        // --- VISUALIZACIÓN DEL CREADOR (Confirmación visual) ---
         Spacer(modifier = Modifier.height(8.dp))
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
@@ -129,7 +124,6 @@ fun AgregarMascotaScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- SECCIÓN: DATOS DE LA MASCOTA ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -243,7 +237,6 @@ fun AgregarMascotaScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- SECCIÓN: DATOS DE CONTACTO ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -285,7 +278,6 @@ fun AgregarMascotaScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- SECCIÓN: FOTO ---
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -324,7 +316,6 @@ fun AgregarMascotaScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- BOTÓN GUARDAR ---
         Button(
             onClick = {
                 when {
@@ -335,7 +326,6 @@ fun AgregarMascotaScreen(
                     telefonoContacto.isBlank() -> Toast.makeText(context, "El Teléfono de Contacto es obligatorio", Toast.LENGTH_LONG).show()
 
                     else -> {
-
                         val creadorParaGuardar = SessionManager.correoUsuario ?: SessionManager.nombreUsuario ?: "Anónimo"
 
                         val nuevaMascota = Mascota(
@@ -349,15 +339,10 @@ fun AgregarMascotaScreen(
                             nombreContacto = nombreContacto,
                             telefonoContacto = telefonoContacto,
                             fotoUri = photoUri.toString(),
-
-                            // Guardamos el CORREO como creador
                             creador = creadorParaGuardar
                         )
 
-                        // Guardar mascota (Xano + Room)
                         scope.launch { viewModel.agregarMascota(nuevaMascota) }
-
-                        // Feedback visual
                         Toast.makeText(context, "Mascota guardada por $creadorParaGuardar", Toast.LENGTH_SHORT).show()
                         navController.popBackStack()
                     }

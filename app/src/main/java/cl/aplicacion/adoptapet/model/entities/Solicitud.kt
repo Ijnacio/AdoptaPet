@@ -12,6 +12,6 @@ data class Solicitud(
     val nombreCompleto: String,
     val direccion: String,
     val tipoVivienda: String,
-    val rangoSueldo: String
-
+    val rangoSueldo: String,
+    val motivo: String
 )

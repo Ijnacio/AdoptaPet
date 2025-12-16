@@ -2,21 +2,18 @@ package cl.aplicacion.adoptapet.model.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName // <--- IMPORTANTE: Agrega este import
+import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "mascota")
 data class Mascota(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
-    // Estos suelen funcionar bien si son una sola palabra
     val nombre: String,
     val tipo: String,
     val raza: String,
     val edad: Int,
     val descripcion: String,
-
-    // AQUÍ ESTÁ LA MAGIA: Traducimos los nombres para Xano
 
     @SerializedName("vacunas_al_dia")
     val vacunasAlDia: Boolean,
@@ -33,6 +30,5 @@ data class Mascota(
     @SerializedName("foto_uri")
     val fotoUri: String,
 
-    // Agregamos 'creador' para cuando terminemos el login
     val creador: String? = null
 )

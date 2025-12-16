@@ -34,7 +34,6 @@ fun LoginScreen(navController: NavHostController) {
     val loginState by authViewModel.loginState.collectAsState()
     val context = LocalContext.current
 
-    // Estados de navegación interna: 0=Inicio, 1=Login, 2=Registro
     var pantallaActual by remember { mutableIntStateOf(0) }
 
     // Variables del formulario
@@ -42,25 +41,17 @@ fun LoginScreen(navController: NavHostController) {
     var correo by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Efectos de éxito/error
     LaunchedEffect(loginState) {
         when (loginState) {
             is LoginState.Success -> {
-                if (pantallaActual == 1) {
-                    // Login exitoso -> Entrar a la app
-                    Toast.makeText(context, "¡Bienvenido!", Toast.LENGTH_SHORT).show()
-                    navController.navigate("feed") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                    authViewModel.resetState()
-                } else if (pantallaActual == 2) {
-                    // Registro exitoso -> Volver al login para ingresar credenciales
-                    Toast.makeText(context, "¡Cuenta creada! Por favor inicia sesión.", Toast.LENGTH_LONG).show()
-                    pantallaActual = 1 // Volver a Login
-                    password = "" // Limpiar pass
-                    // Mantenemos el correo escrito para facilitar
-                    authViewModel.resetState()
+                val mensaje = if (pantallaActual == 2) "¡Cuenta creada! Bienvenido." else "¡Bienvenido!"
+
+                Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show()
+
+                navController.navigate("feed") {
+                    popUpTo("login") { inclusive = true }
                 }
+                authViewModel.resetState()
             }
             is LoginState.Error -> {
                 val error = (loginState as LoginState.Error).mensaje

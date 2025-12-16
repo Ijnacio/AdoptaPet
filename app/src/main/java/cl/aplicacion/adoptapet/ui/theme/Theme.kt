@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-// Esta es la paleta para el MODO OSCURO
 private val DarkColorPalette = darkColorScheme(
     primary = NaranjoFuerte,
     secondary = VerdeFuerte,
@@ -30,7 +29,6 @@ private val DarkColorPalette = darkColorScheme(
     onSurface = TextoOscuro,
 )
 
-//  Esta es la paleta para MODO CLARO (la principal)
 private val LightColorPalette = lightColorScheme(
     primary = NaranjoFuerte,
     secondary = VerdeFuerte,
@@ -50,7 +48,6 @@ fun AdoptaPetTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    // Aquí se decide qué paleta usar (Modo Claro u Oscuro)
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current

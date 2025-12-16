@@ -36,7 +36,7 @@ import cl.aplicacion.adoptapet.model.entities.Mascota
 import cl.aplicacion.adoptapet.viewmodel.MascotaViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
-import cl.aplicacion.adoptapet.utils.SessionManager
+import cl.aplicacion.adoptapet.utils.SessionManager // Asegúrate de importar esto
 
 @Composable
 fun FeedScreen(
@@ -47,6 +47,8 @@ fun FeedScreen(
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
+    // 1. OBTENER EL NÚMERO DE ADOPCIONES (Requiere que hayas actualizado SessionManager)
+    val totalAdopciones = remember(mascotas) { SessionManager.getCantidadAdopciones() }
     var mostrarSoloMisMascotas by remember { mutableStateOf(false) }
     var filtroTipo by remember { mutableStateOf("Todos") }
     val categorias = listOf("Todos", "Perro", "Gato", "Conejo", "Pájaro", "Otro")
@@ -88,6 +90,7 @@ fun FeedScreen(
                         .fillMaxWidth()
                         .padding(vertical = 12.dp)
                 ) {
+                    // --- TÍTULO Y LOGOUT ---
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -122,6 +125,46 @@ fun FeedScreen(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+                    // ==========================================
+                    // 2. TARJETA DEL CONTADOR (Debajo del título)
+                    // ==========================================
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp) // Un poco de margen vertical
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text("🎉", style = MaterialTheme.typography.headlineSmall)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "¡Finales Felices!",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                                )
+                                Text(
+                                    text = "$totalAdopciones mascotas adoptadas",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
+                        }
+                    }
+                    // ==========================================
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // --- FILTROS (Solo si está logueado) ---
                     if (SessionManager.isLoggedIn()) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -143,6 +186,7 @@ fun FeedScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
+                    // --- CATEGORÍAS ---
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -249,6 +293,7 @@ fun FeedScreen(
 
 @Composable
 fun PetCard(mascota: Mascota, onCardClick: () -> Unit) {
+    // ... (El código de PetCard se mantiene igual que antes) ...
     Card(
         modifier = Modifier
             .fillMaxWidth()
